@@ -1,0 +1,9 @@
+*.map
+/hfiles-frontend/node_modules/next
+/hfiles-frontend/node_modules/ajv
+/hfiles-frontend/node_modules
+/HfilesWebApi/HFiles.API/obj
+/hfiles-frontend/.next/cache
+/HfilesWebApi/HFiles.API/.vs
+/HfilesWebApi/HFiles.API/bin
+/hfiles-frontend/.next/static
