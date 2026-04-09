@@ -5,14 +5,14 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ DB Context
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
-// ✅ Services
+
 builder.Services.AddScoped<AuthService>();
 
-// ✅ CORS
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
@@ -23,7 +23,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// ✅ JWT Key
+
 var jwtKey = builder.Configuration["Jwt:Key"];
 
 if (string.IsNullOrEmpty(jwtKey) || jwtKey.Length < 32)
@@ -31,7 +31,7 @@ if (string.IsNullOrEmpty(jwtKey) || jwtKey.Length < 32)
     throw new Exception("JWT Key must be at least 32 characters long");
 }
 
-// ✅ Authentication
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -58,7 +58,7 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 
-    // ✅ Debug errors
+ 
     options.Events = new JwtBearerEvents
     {
         OnAuthenticationFailed = context =>
@@ -74,15 +74,15 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// ✅ Authorization
+
 builder.Services.AddAuthorization();
 
-// ✅ Controllers
+
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// ✅ Middleware Order
+
 app.UseStaticFiles();
 
 app.UseCors("Frontend");
