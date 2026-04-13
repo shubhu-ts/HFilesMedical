@@ -1,18 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+// DB Context
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
-
+// Services
 builder.Services.AddScoped<AuthService>();
 
-
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
@@ -23,7 +24,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-
+// JWT Key Validation
 var jwtKey = builder.Configuration["Jwt:Key"];
 
 if (string.IsNullOrEmpty(jwtKey) || jwtKey.Length < 32)
@@ -31,7 +32,7 @@ if (string.IsNullOrEmpty(jwtKey) || jwtKey.Length < 32)
     throw new Exception("JWT Key must be at least 32 characters long");
 }
 
-
+// Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -58,7 +59,6 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 
- 
     options.Events = new JwtBearerEvents
     {
         OnAuthenticationFailed = context =>
@@ -74,22 +74,57 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-
+// Authorization
 builder.Services.AddAuthorization();
 
-
+// Controllers
 builder.Services.AddControllers();
 
-var app = builder.Build();
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    // Add Bearer Token in Swagger
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "Enter JWT token like: Bearer {token}",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
+    });
 
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+{
+    {
+        new OpenApiSecurityScheme
+        {
+            Reference = new OpenApiReference
+            {
+                Type = ReferenceType.SecurityScheme,
+                Id = "Bearer"
+            }
+        },
+        Array.Empty<string>()
+    }
+});
+});
+    var app = builder.Build();
 
-app.UseStaticFiles();
+    // Middleware
+    app.UseStaticFiles();
 
-app.UseCors("Frontend");
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "HFiles API v1");
+    });
 
-app.UseAuthentication();
-app.UseAuthorization();
+    app.UseCors("Frontend");
 
-app.MapControllers();
+    app.UseAuthentication();
+    app.UseAuthorization();
 
-app.Run();
+    app.MapControllers();
+
+    app.Run();
