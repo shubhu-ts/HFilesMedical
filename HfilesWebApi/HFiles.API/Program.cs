@@ -14,15 +14,19 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<AuthService>();
 
 // CORS
+// In Program.cs (for .NET 6+)
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("Frontend", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://localhost:3001") // Your frontend URL
+              .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowCredentials(); // This is crucial for cookies
     });
 });
+
+
 
 // JWT Key Validation
 var jwtKey = builder.Configuration["Jwt:Key"];
@@ -94,20 +98,7 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "bearer"
     });
 
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-{
-    {
-        new OpenApiSecurityScheme
-        {
-            Reference = new OpenApiReference
-            {
-                Type = ReferenceType.SecurityScheme,
-                Id = "Bearer"
-            }
-        },
-        Array.Empty<string>()
-    }
-});
+    
 });
     var app = builder.Build();
 

@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HFiles.API.Controllers
 {
@@ -92,7 +93,7 @@ namespace HFiles.API.Controllers
             });
         }
 
-       
+        [Authorize]
         [HttpGet("me")]
         public IActionResult Me()
         {
