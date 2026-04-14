@@ -111,7 +111,7 @@ builder.Services.AddSwaggerGen(options =>
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "HFiles API v1");
     });
 
-    app.UseCors("Frontend");
+    app.UseCors("AlloFrontend");
 
     app.UseAuthentication();
     app.UseAuthorization();
