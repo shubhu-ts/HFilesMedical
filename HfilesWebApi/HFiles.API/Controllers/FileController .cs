@@ -19,7 +19,11 @@ namespace HFiles.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Upload(IFormFile file, string fileName, string fileType)
+        [HttpPost]
+        public async Task<IActionResult> Upload(
+    [FromForm] IFormFile file,
+    [FromForm] string fileName,
+    [FromForm] string fileType)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return Unauthorized();

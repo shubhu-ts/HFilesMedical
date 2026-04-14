@@ -25,9 +25,8 @@ namespace HFiles.API.Controllers
             var user = _context.Users.Find(int.Parse(userId));
             return Ok(user);
         }
-
         [HttpPut]
-        public IActionResult Update(User updated)
+        public IActionResult Update(UpdateUserDto updated)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return Unauthorized();
